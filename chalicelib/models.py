@@ -1,35 +1,32 @@
 from peewee import Model, ForeignKeyField, DoubleField, IntegerField, CharField, DateField, TextField, BooleanField, \
     PostgresqlDatabase
 
+db = PostgresqlDatabase(database='projectbazar', user='postgres', password='1234')
+
 
 class BaseModel(Model):
     class Meta:
-        database = PostgresqlDatabase(database='host')
+        database = db
+
+
+class Endereco(BaseModel):
+    rua = TextField()
+    numero = CharField()
+    complemento = TextField(null=True)
+    estado = CharField()
+    cidade = CharField()
 
 
 class Cliente(BaseModel):
     nome = CharField()
     cpf = CharField()
     telefone = CharField()
-
-
-class Endereco(BaseModel):
-    cliente = ForeignKeyField(Cliente)
-    rua = TextField()
-    numero = CharField()
-    complemento = TextField()
-    estado = CharField()
-    cidade = CharField()
-
-
-class Entrega(BaseModel):
     endereco = ForeignKeyField(Endereco)
-    frete = DoubleField()
 
 
 class Pagamento(BaseModel):
-    cliente = ForeignKeyField(Cliente)
     esta_pago = BooleanField()
+    forma_pagamento = CharField()
 
 
 class Produto(BaseModel):
@@ -42,27 +39,7 @@ class Produto(BaseModel):
 class Pedido(BaseModel):
     cliente = ForeignKeyField(Cliente)
     valor_total = DoubleField()
-    entrega = ForeignKeyField(Entrega)
     pagamento = ForeignKeyField(Pagamento)
-
-    def calcular_valor_total_pedido(self):
-        self.valor_total = 0
-        query = (ItensPedidos
-                 .select(ItensPedidos, Pedido, Produto)
-                 .join(Pedido)
-                 .switch(ItensPedidos)
-                 .join(Produto))
-        for item in query:
-            self.valor_total += item.preco
-        return self.valor_total
-
-    def calcular_valor_total_frete(self):
-        if self.valor_total <= 100:
-            if self.cliente.endereco.estado == 'SP':
-                self.valor_total += 10
-            elif self.cliente.endereco.estado != 'RJ':
-                self.valor_total += 20
-        return self.valor_total
 
 
 class ItensPedidos(BaseModel):
@@ -78,20 +55,13 @@ class Carrinho(BaseModel):
     frete = DoubleField()
     cliente = ForeignKeyField(Cliente)
 
-    def simular_frete(self):
-        if self.valor_total > 100:
-            return 0
-        else:
-            if self.cliente.estado == 'RJ':
-                return 0
-            elif self.cliente.endereco.estado == 'SP':
-                return 10
-            else:
-                return 20
-
 
 class ItensCarrinho(BaseModel):
     carrinho = ForeignKeyField(Carrinho)
     produto = ForeignKeyField(Produto)
     quantidade = IntegerField()
     preco = DoubleField()
+
+
+# if db.table_exists('carrinho') is not None:
+    db.create_tables(BaseModel.__subclasses__())
