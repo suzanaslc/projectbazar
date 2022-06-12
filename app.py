@@ -26,8 +26,22 @@ def create_pedido(cliente_id):
         valor_total = services.save_itens(itens, pedido.id)
         valor_total = services.calcular_valor_total_frete(valor_total, cliente.endereco.estado)
         pedido.valor_total = valor_total
-        pedido.save()
+        pedido.replace()
         return {"id-pedido": pedido.id}
+    except Exception as e:
+        traceback.format_exc()
+        raise e
+
+
+@app.route('/{cliente_id}/carrinho/frete', methods=['GET'])
+def simular_frete(cliente_id):
+    try:
+        request = app.current_request
+        json_body = request.json_body
+        cliente = Cliente.get_by_id(cliente_id)
+        itens = json_body['itens']
+        frete = services.simular_frete(itens, cliente.endereco.estado)
+        return {'frete': frete}
     except Exception as e:
         traceback.format_exc()
         raise e

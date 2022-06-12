@@ -29,3 +29,18 @@ def save_itens(itens, id_pedido):
         item_classe.save()
         valor_total += item['preco']
     return valor_total
+
+
+def simular_frete(itens, estado):
+    valor_total = 0
+    for item in itens:
+        valor_total += item['preco']
+    if valor_total > 100:
+        return 0
+    else:
+        if estado == 'RJ':
+            return 0
+        elif estado == 'SP':
+            return 10
+        else:
+            return 20

@@ -63,5 +63,5 @@ class ItensCarrinho(BaseModel):
     preco = DoubleField()
 
 
-# if db.table_exists('carrinho') is not None:
+if db.table_exists('carrinho') is not None:
     db.create_tables(BaseModel.__subclasses__())
