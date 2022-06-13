@@ -1,4 +1,4 @@
-from chalicelib.models import ItensPedidos, Pagamento, Carrinho, ItensCarrinho, Cliente, Pedido
+from chalicelib.models import ItensPedidos, Pagamento, Carrinho, ItensCarrinho, Cliente, Pedido, Endereco
 
 
 def adicionar_carrinho(carrinho_id, item):
@@ -76,3 +76,13 @@ def fazer_pagamento(id_pedido):
     query.execute()
     pagamento = Pagamento.get(Pagamento.id == pagamento_id)
     return pagamento.esta_pago
+
+
+def cadastrar_cliente(json_body):
+    endereco = Endereco(rua=json_body['rua'], numero=json_body['numero'], complemento=json_body['complemento'],
+                        estado=json_body['estado'], cidade=json_body['cidade'])
+    endereco.save()
+    cliente = Cliente(nome=json_body['nome'], telefone=json_body['telefone'], cpf=json_body['cpf'],
+                      endereco=endereco)
+    cliente.save()
+    return cliente.id
