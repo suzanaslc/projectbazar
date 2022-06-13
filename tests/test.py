@@ -30,6 +30,7 @@ def testar_simular_frete(cliente_id, carrinho_id):
         assert response.json_body == {'frete': 0}
 
 
+# FUNÇÃO QUE CRIA O PEDIDO E CALCULA O FRETE
 def testar_criar_pedido(cliente_id, carrinho_id):
     with Client(app) as client:
         response = client.http.post(
@@ -50,5 +51,24 @@ def testar_fazer_pagamento(cliente_id, pedido_id):
     assert response.json_body == {'status_pagamento': True}
 
 
+def testar_cadastrar_cliente():
+    with Client(app) as client:
+        response = client.http.post(
+            f'/cadastro',
+            headers={'Content-Type': 'application/json'},
+            body=json.dumps({
+                "nome": "Suzana",
+                "telefone": "123",
+                "cpf": "456",
+                "rua": "Rua da FAETERJ",
+                "numero": "11",
+                "complemento": "10",
+                "estado": "RJ",
+                "cidade": "Rio de Janeiro"
+            })
+        )
+        assert response.json_body == {'id_cliente': 4}
+
+
 if __name__ == '__main__':
-    testar_fazer_pagamento(1, 12)
+    testar_cadastrar_cliente()
