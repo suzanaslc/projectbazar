@@ -2,13 +2,14 @@ import json
 
 from chalice.test import Client
 from app import app
-from chalicelib.models import ItensCarrinho
+from chalicelib import services
+from chalicelib.models import ItensCarrinho, Cliente
 
 
-def testar_adicionar_carrinho():
+def testar_adicionar_carrinho(cliente_id, carrinho_id):
     with Client(app) as client:
         response = client.http.put(
-            '/1/carrinho/1',
+            f'/{cliente_id}/carrinho/{carrinho_id}',
             headers={'Content-Type': 'application/json'},
             body=json.dumps({
                 'item': {
@@ -18,10 +19,17 @@ def testar_adicionar_carrinho():
                 }
             })
         )
-        carrinho = ItensCarrinho.select().order_by(ItensCarrinho.id.desc()).get()
-        id_carrinho = carrinho.id
-        assert response.json_body == {'id_item': id_carrinho}
+        assert response.json_body == {'id_item': 11}
+
+
+def testar_simular_frete(cliente_id, carrinho_id):
+    with Client(app) as client:
+        response = client.http.get(
+            f'/{cliente_id}/carrinho/{carrinho_id}/frete'
+        )
+        assert response.json_body == {'frete': 0}
 
 
 if __name__ == '__main__':
-    testar_adicionar_carrinho()
+    testar_adicionar_carrinho(1, 1)
+    testar_simular_frete(1, 1)
