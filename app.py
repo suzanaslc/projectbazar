@@ -47,10 +47,10 @@ def create_pedido(cliente_id, carrinho_id):
         raise e
 
 
-@app.route('/pedidos/{id_pedido}/pagamento', methods=['POST'])
-def fazer_pagamento(id_pedido):
+@app.route('/{cliente_id}/pedidos/{pedido_id}/pagamento', methods=['POST'])
+def fazer_pagamento(cliente_id, pedido_id):
     try:
-        status_pagamento = services.fazer_pagamento(id_pedido)
+        status_pagamento = services.fazer_pagamento(pedido_id)
         return {"status_pagamento": status_pagamento}
     except Exception as e:
         traceback.format_exc()
